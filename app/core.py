@@ -1,9 +1,28 @@
 """Your code. One stub per milestone; build them in order and keep each one small."""
 
+from __future__ import annotations
+
+from typing import Any
+from app.corpus import clean_text, tokenize, split_sentences, prepare_corpus, DEFAULT_LEGAL_CORPUS
+
 # --- Milestone 1: Prepare a small legal text corpus for n-gram training.
 # Hint: Use text processing techniques from the 'Build a Next-Word Predictor from Scratch' drill.
-def milestone_1():  # TODO(milestone 1)
-    raise NotImplementedError("TODO(milestone 1)")
+def milestone_1(corpus_path: str | None = None) -> dict[str, Any]:
+    """Prepare and tokenize the legal corpus for n-gram training.
+    
+    Processes the legal text corpus with normalization, tokenization,
+    vocabulary extraction, and frequency counting.
+    """
+    processed = prepare_corpus(corpus_path or "data/legal_corpus.txt", lowercase=True)
+    return {
+        "sentence_count": len(processed["raw_sentences"]),
+        "total_tokens": processed["total_tokens"],
+        "vocab_size": processed["vocab_size"],
+        "vocabulary": processed["vocabulary"],
+        "tokenized_sentences": processed["tokenized_sentences"],
+        "token_frequencies": processed["token_frequencies"],
+    }
+
 
 
 # --- Milestone 2: Implement the n-gram next-word predictor.
