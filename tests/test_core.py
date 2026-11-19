@@ -2,6 +2,7 @@
 
 They start skipped. Remove the `skip` line as you work on each milestone.
 """
+import math
 import pytest
 
 # Milestone 1: Prepare a small legal text corpus for n-gram training.
@@ -35,9 +36,42 @@ def test_milestone_1():
 
 
 # Milestone 2: Implement the n-gram next-word predictor.
-@pytest.mark.skip(reason="remove this line when you start milestone 2")
 def test_milestone_2():
-    raise NotImplementedError("write the test for milestone 2")
+    from app.core import milestone_2
+    from app.ngram import NGramPredictor
+
+    # 1. Direct NGramPredictor unit tests (bigram and trigram)
+    sentences = [
+        ["this", "agreement", "shall", "be", "governed", "by", "law"],
+        ["this", "agreement", "may", "be", "terminated", "by", "notice"],
+        ["either", "party", "may", "terminate", "this", "agreement"],
+    ]
+
+    bigram = NGramPredictor(n=2, smoothing="laplace", k=1.0)
+    bigram.fit(sentences)
+
+    # Context "this" -> "agreement" should have high probability
+    preds = bigram.predict_next_word("this", top_k=3)
+    words = [w for w, _ in preds]
+    assert "agreement" in words
+
+    # Test generation from seed
+    draft = bigram.generate(seed="this agreement", max_tokens=8, seed_random=42)
+    assert draft.startswith("This agreement")
+    assert draft.endswith(".")
+
+    # Test perplexity calculation
+    ppl = bigram.perplexity(sentences)
+    assert ppl > 0 and not math.isinf(ppl)
+
+    # 2. Test milestone_2 end-to-end function
+    res = milestone_2(n=3)
+    assert "predictor" in res
+    assert res["n"] == 3
+    assert len(res["prompts"]) > 0
+    assert "This Agreement shall" in res["generations"]
+    assert len(res["predictions"]["This Agreement shall"]) > 0
+
 
 
 # Milestone 3: Load the pre-trained GPT-2 model and fine-tuned adapter for legal clause tagging.

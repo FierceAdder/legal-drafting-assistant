@@ -25,10 +25,44 @@ def milestone_1(corpus_path: str | None = None) -> dict[str, Any]:
 
 
 
+from app.ngram import NGramPredictor
+
 # --- Milestone 2: Implement the n-gram next-word predictor.
 # Hint: Apply the n-gram model building and prediction steps from the 'Build a Next-Word Predictor from Scratch' drill.
-def milestone_2():  # TODO(milestone 2)
-    raise NotImplementedError("TODO(milestone 2)")
+def milestone_2(n: int = 3, smoothing: str = "laplace") -> dict[str, Any]:
+    """Train an n-gram next-word predictor on the legal corpus and generate sample drafts.
+    
+    Returns the trained predictor model, next-word predictions for legal prompts,
+    and generated legal sentences.
+    """
+    corpus_info = milestone_1()
+    predictor = NGramPredictor(n=n, smoothing=smoothing, k=1.0)
+    predictor.fit(corpus_info["tokenized_sentences"])
+
+    prompts = [
+        "This Agreement shall",
+        "Either party may terminate",
+        "The Receiving Party agrees to",
+        "The Service Provider agrees to defend",
+    ]
+
+    predictions: dict[str, list[tuple[str, float]]] = {}
+    generations: dict[str, str] = {}
+
+    for prompt in prompts:
+        predictions[prompt] = predictor.predict_next_word(prompt, top_k=5)
+        generations[prompt] = predictor.generate(seed=prompt, max_tokens=15, temperature=0.7, seed_random=42)
+
+    return {
+        "predictor": predictor,
+        "n": n,
+        "smoothing": smoothing,
+        "vocab_size": len(predictor.vocab),
+        "prompts": prompts,
+        "predictions": predictions,
+        "generations": generations,
+    }
+
 
 
 # --- Milestone 3: Load the pre-trained GPT-2 model and fine-tuned adapter for legal clause tagging.
