@@ -130,7 +130,17 @@ def milestone_4(
 
 
 
+from app.evaluate import evaluate_classifier
+
 # --- Milestone 5: Evaluate classification accuracy on example clauses.
 # Hint: Use evaluation methods for classification tasks, as demonstrated in the 'Fine-Tune GPT-2 to Tag Legal Contract Clauses' drill.
-def milestone_5():  # TODO(milestone 5)
-    raise NotImplementedError("TODO(milestone 5)")
+def milestone_5(
+    fast_fallback: bool = False, dataset_path: str | None = None
+) -> dict[str, Any]:
+    """Evaluate classification accuracy, precision, recall, and baselines on example clauses."""
+    return evaluate_classifier(
+        dataset_path=dataset_path,
+        split="test",
+        fast_fallback=fast_fallback,
+    )
+

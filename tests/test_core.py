@@ -132,7 +132,32 @@ def test_milestone_4(capsys):
 
 
 # Milestone 5: Evaluate classification accuracy on example clauses.
-@pytest.mark.skip(reason="remove this line when you start milestone 5")
 def test_milestone_5():
-    raise NotImplementedError("write the test for milestone 5")
+    from app.core import milestone_5
+    from app.evaluate import evaluate_classifier
+
+    # Run evaluation using fast fallback
+    res = milestone_5(fast_fallback=True)
+
+    # 1. Verify accuracy and sample counts
+    assert res["total_samples"] == 10
+    assert res["accuracy"] >= 0.80
+
+    # 2. Verify baseline comparison
+    assert res["baseline_random_accuracy"] == 0.20
+    assert res["accuracy_gain_vs_random"] > 0.50
+
+    # 3. Verify per-class metrics
+    for cls_name in ["Confidentiality", "Governing Law", "Termination", "Indemnification", "Payment"]:
+        assert cls_name in res["per_class_metrics"]
+        metrics = res["per_class_metrics"][cls_name]
+        assert "precision" in metrics
+        assert "recall" in metrics
+        assert "f1" in metrics
+        assert metrics["support"] == 2
+
+    # 4. Verify confusion matrix and limits
+    assert len(res["confusion_matrix"]) == 5
+    assert len(res["limits"]) > 0
+
 
