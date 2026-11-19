@@ -119,9 +119,9 @@ def load_legal_corpus(filepath: str | Path | None = None) -> list[str]:
         return list(DEFAULT_LEGAL_CORPUS)
     
     content = path.read_text(encoding="utf-8")
-    lines = [clean_text(line) for line in content.splitlines()]
-    sentences = [line for line in lines if line]
+    sentences = split_sentences(content)
     return sentences or list(DEFAULT_LEGAL_CORPUS)
+
 
 
 def prepare_corpus(
