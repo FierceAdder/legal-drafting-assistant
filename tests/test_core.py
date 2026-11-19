@@ -104,9 +104,31 @@ def test_milestone_3():
 
 
 # Milestone 4: Create a CLI interface to generate text and then classify the generated text.
-@pytest.mark.skip(reason="remove this line when you start milestone 4")
-def test_milestone_4():
-    raise NotImplementedError("write the test for milestone 4")
+def test_milestone_4(capsys):
+    from app.core import milestone_4
+    from app.cli import main
+
+    # 1. Test milestone_4 programmatic integration
+    res = milestone_4(seed="The Receiving Party agrees to", n=3, fast_fallback=True)
+    assert res["seed"] == "The Receiving Party agrees to"
+    assert len(res["generated_text"]) > 10
+    assert res["predicted_label"] in ["Confidentiality", "Governing Law", "Termination", "Indemnification", "Payment"]
+    assert res["confidence"] > 0
+
+    # 2. Test CLI commands via main()
+    main(["draft", "--seed", "This Agreement shall", "--fast"])
+    out = capsys.readouterr().out
+    assert "Generated Legal Draft" in out
+    assert "Clause Classification" in out
+
+    main(["generate", "--seed", "Either party may terminate", "--n", "2"])
+    out_gen = capsys.readouterr().out
+    assert "Generated:" in out_gen
+
+    main(["classify", "This Agreement shall be governed by New York law.", "--fast"])
+    out_cls = capsys.readouterr().out
+    assert "Predicted Type:   Governing Law" in out_cls
+
 
 
 # Milestone 5: Evaluate classification accuracy on example clauses.

@@ -97,8 +97,37 @@ def milestone_3(fast_fallback: bool = False) -> dict[str, Any]:
 
 # --- Milestone 4: Create a CLI interface to generate text and then classify the generated text.
 # Hint: Integrate the n-gram predictor and the fine-tuned GPT-2 model into a command-line interface.
-def milestone_4():  # TODO(milestone 4)
-    raise NotImplementedError("TODO(milestone 4)")
+def milestone_4(
+    seed: str = "This Agreement shall",
+    n: int = 3,
+    max_tokens: int = 15,
+    temperature: float = 0.7,
+    fast_fallback: bool = False,
+) -> dict[str, Any]:
+    """Generate legal text using n-gram predictor and instantly classify it with fine-tuned GPT-2."""
+    corpus_info = milestone_1()
+    predictor = NGramPredictor(n=n, smoothing="laplace")
+    predictor.fit(corpus_info["tokenized_sentences"])
+
+    generated_text = predictor.generate(
+        seed=seed,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        seed_random=42,
+    )
+
+    classifier = get_classifier(fast_fallback=fast_fallback)
+    classification = classifier.predict(generated_text)
+
+    return {
+        "seed": seed,
+        "n": n,
+        "generated_text": generated_text,
+        "predicted_label": classification["predicted_label"],
+        "confidence": classification["confidence"],
+        "probabilities": classification["probabilities"],
+    }
+
 
 
 # --- Milestone 5: Evaluate classification accuracy on example clauses.
