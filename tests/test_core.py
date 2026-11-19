@@ -75,9 +75,32 @@ def test_milestone_2():
 
 
 # Milestone 3: Load the pre-trained GPT-2 model and fine-tuned adapter for legal clause tagging.
-@pytest.mark.skip(reason="remove this line when you start milestone 3")
 def test_milestone_3():
-    raise NotImplementedError("write the test for milestone 3")
+    from app.core import milestone_3
+    from app.classifier import LegalClauseClassifier
+
+    # 1. Test classifier direct instantiation (fast fallback test)
+    classifier = LegalClauseClassifier(fast_fallback=True)
+    res = classifier.predict("The Receiving Party shall hold all Confidential Information in strict confidence.")
+    assert res["predicted_label"] == "Confidentiality"
+    assert res["confidence"] > 0.5
+    assert "Confidentiality" in res["probabilities"]
+
+    # Test governing law clause
+    res_law = classifier.predict("This Agreement shall be governed by the laws of Delaware.")
+    assert res_law["predicted_label"] == "Governing Law"
+
+    # 2. Test milestone_3 end-to-end function
+    m3_res = milestone_3(fast_fallback=True)
+    assert "classifier" in m3_res
+    assert len(m3_res["predictions"]) == 5
+    predicted_labels = [p["predicted_label"] for p in m3_res["predictions"]]
+    assert "Confidentiality" in predicted_labels
+    assert "Governing Law" in predicted_labels
+    assert "Termination" in predicted_labels
+    assert "Indemnification" in predicted_labels
+    assert "Payment" in predicted_labels
+
 
 
 # Milestone 4: Create a CLI interface to generate text and then classify the generated text.

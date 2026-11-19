@@ -65,10 +65,34 @@ def milestone_2(n: int = 3, smoothing: str = "laplace") -> dict[str, Any]:
 
 
 
+from app.classifier import LegalClauseClassifier, get_classifier
+
 # --- Milestone 3: Load the pre-trained GPT-2 model and fine-tuned adapter for legal clause tagging.
 # Hint: Follow the steps for loading a fine-tuned GPT-2 model from the 'Fine-Tune GPT-2 to Tag Legal Contract Clauses' drill.
-def milestone_3():  # TODO(milestone 3)
-    raise NotImplementedError("TODO(milestone 3)")
+def milestone_3(fast_fallback: bool = False) -> dict[str, Any]:
+    """Load the pre-trained GPT-2 model with fine-tuned adapter for legal clause tagging.
+    
+    Classifies standard test legal contract clauses and returns predictions,
+    confidence scores, and probability distributions.
+    """
+    classifier = get_classifier(fast_fallback=fast_fallback)
+    test_clauses = [
+        "The Receiving Party agrees to maintain all proprietary technical data in strict confidence.",
+        "This Agreement shall be governed by and construed in accordance with the laws of New York.",
+        "Either party may terminate this Agreement upon thirty days written notice.",
+        "Service Provider shall defend, indemnify, and hold harmless Client against third-party claims.",
+        "The Client shall pay all undisputed invoiced amounts within thirty days of invoice receipt.",
+    ]
+
+    results = classifier.predict_batch(test_clauses)
+    return {
+        "classifier": classifier,
+        "classes": classifier.classes,
+        "device": str(classifier.device) if hasattr(classifier, "device") else "cpu",
+        "test_clauses": test_clauses,
+        "predictions": results,
+    }
+
 
 
 # --- Milestone 4: Create a CLI interface to generate text and then classify the generated text.
